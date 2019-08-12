@@ -15,7 +15,7 @@ abstract class SimpleStore<S>(
             return
         }
         currentState = newState
-        subscriptions.forEach { it(currentState) }
+        subscriptions.forEach { it(currentState, ::dispatch) }
     }
 
     private fun applyReducers(current: S, action: Action): S {
@@ -26,12 +26,10 @@ abstract class SimpleStore<S>(
         return newState
     }
 
-    override fun subscribe(subscription: Subscription<S>) {
+    override fun subscribe(subscription: Subscription<S>): Unsubscribe {
         subscriptions.add(subscription)
-        subscription(currentState)
+        subscription(currentState, ::dispatch)
+        return { subscriptions.remove(subscription) }
     }
 
-    override fun unsubscribe(subscription: Subscription<S>) {
-        subscriptions.remove(subscription)
-    }
 }
