@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.pfmiranda.redux2.redux.AppState
-import com.pfmiranda.redux2.redux.AppStore
-import com.pfmiranda.redux2.redux.ClearData
-import com.pfmiranda.redux2.redux.NewData
+import com.pfmiranda.redux2.redux.*
 
 class MainActivity : AppCompatActivity() {
 
+    private var dispatch: Dispatch? = null
+    private lateinit var unsubscribe: Unsubscribe
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -21,22 +20,25 @@ class MainActivity : AppCompatActivity() {
         val BotonBorrar = findViewById<Button>(R.id.buttonBorrar)
         val texto = findViewById<EditText>(R.id.editTextIngreso)
 
+        unsubscribe = AppStore.instance.subscribe(::render)
 
         BotonAgregar.setOnClickListener {
-            AppStore.instance.dispatch(NewData(texto.text.toString()))
+            dispatch?.invoke(NewData(texto.text.toString()))
         }
         BotonBorrar.setOnClickListener {
-            AppStore.instance.dispatch(ClearData)
+            dispatch?.invoke(ClearData)
         }
-        AppStore.instance.subscribe(::render)
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        AppStore.instance.unsubscribe(::render)
+        unsubscribe.invoke()
+        dispatch = null
     }
 
-    private fun render(appState: AppState) {
+    private fun render(appState: AppState, dispatch: Dispatch) {
+        this.dispatch = dispatch
         Toast.makeText(this, appState.data, Toast.LENGTH_SHORT).show()
     }
 }
