@@ -6,10 +6,10 @@ typealias Dispatch = (Action) -> Unit
 typealias Reducer<S> = (S, Action) -> S
 typealias Subscription<S> = (S,Dispatch) -> Unit
 typealias Unsubscribe = () -> Unit
-/*
+
 typealias Next<S> = (S, Action, Dispatch) -> Action
 typealias Middleware<S> = (S, Action, Dispatch, Next<S>) -> Action
-*/
+
 
 
 interface Store<S> {
